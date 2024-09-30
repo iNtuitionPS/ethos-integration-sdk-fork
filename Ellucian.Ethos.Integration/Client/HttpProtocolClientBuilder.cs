@@ -24,9 +24,9 @@ namespace Ellucian.Ethos.Integration.Client
         /// Time in seconds to allow an http connection to time out. Default is
         /// 300 seconds (5 minutes).
         /// </summary>
-        private static int CONNECTION_TIMEOUT = 300;
+        private static readonly int CONNECTION_TIMEOUT = 300;
 
-        private const SslProtocols PROTOCOL = SslProtocols.Tls13 | SslProtocols.Tls12 | SslProtocols.Tls11;
+        private const SslProtocols PROTOCOL = SslProtocols.Tls13 | SslProtocols.Tls12;
 
         private const string CLIENT_NAME = "EllucianEthosIntegrationSdk-dotnet";
 
@@ -44,10 +44,7 @@ namespace Ellucian.Ethos.Integration.Client
         /// 300 seconds (5 minutes).</param>
         public HttpProtocolClientBuilder( HttpClient client, int? connectionTimeOut = null )
         {
-            if ( client == null )
-            {
-                client = BuildHttpClient( connectionTimeOut.HasValue ? connectionTimeOut : CONNECTION_TIMEOUT );
-            }
+            client ??= BuildHttpClient( connectionTimeOut.HasValue ? connectionTimeOut : CONNECTION_TIMEOUT );
 
             Client = client;
         }
@@ -66,7 +63,7 @@ namespace Ellucian.Ethos.Integration.Client
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add( "pragma", "no-cache" );
                 client.DefaultRequestHeaders.Add( "cache-control", "no-cache" );
-                ProductInfoHeaderValue prodHeaderVal = new ProductInfoHeaderValue( CLIENT_NAME, Assembly.GetExecutingAssembly().GetName()?.Version?.ToString() );
+                ProductInfoHeaderValue prodHeaderVal = new( CLIENT_NAME, Assembly.GetExecutingAssembly().GetName()?.Version?.ToString() );
                 client.DefaultRequestHeaders.UserAgent.Add( prodHeaderVal );
                 client.Timeout = TimeSpan.FromMinutes( ( double ) connectionTimeout );
             } )
